@@ -27,4 +27,16 @@ echo "$containerId" > /tmp/containerId
 echo "*/$NEXTCLOUD_CRON_MINUTE_INTERVAL * * * * /cron-tasks.sh $containerId" \
     > /var/spool/cron/crontabs/root
 
-exec crond -f -l 0 -L /dev/stdout
+# Watch for SIGTERM (someone stops the docker container) so we can tell crond to exit
+_term() {
+    echo "Caught SIGTERM signal!"
+    kill -TERM "$child" 2>/dev/null
+}
+
+trap _term SIGTERM
+
+exec crond -f -l 0 &
+echo "Started crond"
+
+child=$!
+wait "$child"
