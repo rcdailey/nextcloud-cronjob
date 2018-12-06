@@ -7,6 +7,7 @@ ENV NEXTCLOUD_PROJECT_NAME=
 ENV NEXTCLOUD_CRON_MINUTE_INTERVAL=15
 
 COPY scripts/*.sh /
+COPY scripts/cron-scripts /cron-scripts
 
 ENTRYPOINT ["/entrypoint.sh"]
 

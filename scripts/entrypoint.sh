@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
 if [[ -z "$NEXTCLOUD_CONTAINER_NAME" ]]; then
     echo "NEXTCLOUD_CONTAINER_NAME is a required variable"

@@ -27,13 +27,13 @@ services:
     restart: always
     network_mode: none
     depends_on:
-      - app
+    - app
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/localtime:/etc/localtime:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/localtime:/etc/localtime:ro
     environment:
-      - NEXTCLOUD_CONTAINER_NAME=app
-      - NEXTCLOUD_PROJECT_NAME=nextcloud
+    - NEXTCLOUD_CONTAINER_NAME=app
+    - NEXTCLOUD_PROJECT_NAME=nextcloud
 ```
 
 In this example, the `cron` service runs with a dependency on `app` (which is Nextcloud itself).
@@ -67,13 +67,57 @@ is checked every interval of the health check. If any of these checks fail, it i
 container's health status will become *unhealthy*. In this case, you should restart the container.
 
 1. The `crond` process must be running.
-2. The Nextcloud container must be available and running. One important note here: When this
+1. The Nextcloud container must be available and running. One important note here: When this
    container starts up, it immediately searches for the container by name and remembers it by the
    container's ID. If for whatever reason the Nextcloud container changes in such a way that the ID
    is no longer valid, the health check would fail.
+
+# Customizing Cron Tasks
+
+This container provides the ability for you to run additional tasks inside the Nextcloud container
+in addition to the default `cron.php` task. To add your custom tasks, follow these steps:
+
+1. Write a shell script that runs the commands that will be part of your task. This shell script
+   must have the `.sh` extension. An example of the contents of such a script is below. As an
+   optional security measure, do not make this shell script executable. The contents of the file are
+   piped into `bash`, so the executable bit is not used.
+
+   ```sh
+   #!/usr/bin/env bash
+   php -f /var/www/html/cron.php
+   ```
+1. Mount this shell script inside the `/cron-scripts` directory. Here's an example if you're using
+   `docker-compose.yml`:
+
+   ```yml
+   services:
+     cron:
+       image: voidpointer/nextcloud-cronjob
+       volumes:
+       - ./my-scripts/do-something.sh:/cron-scripts/do-something.sh:ro
+   ```
+1. Recreate the container. Your script will now execute in the Nextcloud container at a regular
+   interval.
+
+## Notes
+
+* All cron task shell scripts run at the same interval defined by `NEXTCLOUD_CRON_MINUTE_INTERVAL`.
+* Modification of your own shell scripts on the host do not require that you restart/recreate the
+  container.
 
 # Debugging
 
 All logs from `crond` are configured to print to stdout, so you can monitor container logs (via
 `docker-compose logs -f`). This should allow you to make sure your cron job is working. You can also
-use the "Overview" page in Nextcloud Settings to see if the cron job is being run regularly.
+use the "Overview" page in Nextcloud Settings to see if the cron job is being run regularly. Here is
+an example of the logs you will see:
+
+```
+Started crond
+-------------------------------------------------------------
+ Executing Cron Tasks: Thu Dec  6 17:28:00 CST 2018
+-------------------------------------------------------------
+> Running Script: occ-preview-pre-generate.sh
+> Running Script: run_cron_php.sh
+> Done
+```
