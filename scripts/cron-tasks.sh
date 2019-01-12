@@ -5,13 +5,19 @@ echo "-------------------------------------------------------------"
 echo " Executing Cron Tasks: $(date)"
 echo "-------------------------------------------------------------"
 
+# If a user must be specified when executing the task, set up that option here.
+# You may also leave NEXTCLOUD_EXEC_USER blank, in which case it will not be used.
+if [[ -n "$NEXTCLOUD_EXEC_USER" ]]; then
+    exec_user="--user $NEXTCLOUD_EXEC_USER"
+fi
+
 # Loop through all shell scripts and execute the contents of those scripts in the Nextcloud
 # container. It's done this way so that the user may mount more scripts to be executed in addition
 # to the default ones.
 cd /cron-scripts
 for script in *.sh; do
     echo "> Running Script: $script"
-    docker exec -i "$1" bash < $script
+    docker exec $exec_user -i "$1" bash < $script
 done
 
 echo "> Done"

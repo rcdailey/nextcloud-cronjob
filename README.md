@@ -59,6 +59,13 @@ entirely.
 * `NEXTCLOUD_CRON_MINUTE_INTERVAL`<br>
   The interval, in minutes, of how often the cron task
   executes. The default is 15 minutes.
+* `NEXTCLOUD_EXEC_USER`<br>
+  The user that should be used to run the cron tasks inside the Nextcloud container. This parameter
+  is specified to the `docker exec` command from this container. By default, the user used is
+  `www-data`, which is also the default user used inside Nextcloud, unless you've overridden it. You
+  may also define this environment variable to be blank (e.g. `NEXTCLOUD_EXEC_USER=`) which results
+  in the tasks being executed using the Nextcloud container's running user. Specifically, the
+  `--user` option will *not* be provided to the `docker exec` command.
 
 # Container Health
 
@@ -67,7 +74,7 @@ is checked every interval of the health check. If any of these checks fail, it i
 container's health status will become *unhealthy*. In this case, you should restart the container.
 
 1. The `crond` process must be running.
-1. The Nextcloud container must be available and running. One important note here: When this
+2. The Nextcloud container must be available and running. One important note here: When this
    container starts up, it immediately searches for the container by name and remembers it by the
    container's ID. If for whatever reason the Nextcloud container changes in such a way that the ID
    is no longer valid, the health check would fail.
