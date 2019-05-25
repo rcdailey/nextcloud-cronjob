@@ -1,4 +1,6 @@
-# Summary
+# Nextcloud Cron Job Docker Container
+
+## Summary
 
 This container is designed to run along side your Nextcloud container to execute its
 `/var/www/html/cron.php` at a regular interval. There is an "official" way of doing this, however it
@@ -6,7 +8,7 @@ doesn't work when you run your Nextcloud container using a non-root user. I also
 that this solution is easier to manage, since it doesn't require the same environment as Nextcloud
 itself (i.e. no network requirements, no database requirements, etc).
 
-# Setup Instructions
+## Setup Instructions
 
 Since Nextcloud's entire setup can get rather complex with Docker, I highly recommend you set up
 everything using [Docker Compose](https://docs.docker.com/compose/).
@@ -23,7 +25,7 @@ services:
     image: nextcloud:apache
 
   cron:
-    image: voidpointer/nextcloud-cronjob
+    image: rcdailey/nextcloud-cronjob
     restart: always
     network_mode: none
     depends_on:
@@ -44,11 +46,12 @@ help identify the right container to execute the command in.
 Note that if you don't use Docker Compose, you can leave `NEXTCLOUD_PROJECT_NAME` blank or omitted
 entirely.
 
-# Environment Variables
+## Environment Variables
 
 * `NEXTCLOUD_CONTAINER_NAME`<br>
   Required. This is the name of the running Nextcloud container (or
   the service, if `NEXTCLOUD_PROJECT_NAME` is specified).
+
 * `NEXTCLOUD_PROJECT_NAME`<br>
   The name of the project if you're using Docker Compose. The name of
   the project, by default, is the name of the context directory you ran your `docker-compose.yml`
@@ -56,9 +59,11 @@ entirely.
   built as:
 
       ${NEXTCLOUD_PROJECT_NAME}_${NEXTCLOUD_CONTAINER_NAME}
+
 * `NEXTCLOUD_CRON_MINUTE_INTERVAL`<br>
   The interval, in minutes, of how often the cron task
   executes. The default is 15 minutes.
+
 * `NEXTCLOUD_EXEC_USER`<br>
   The user that should be used to run the cron tasks inside the Nextcloud container. This parameter
   is specified to the `docker exec` command from this container. By default, the user used is
@@ -67,7 +72,7 @@ entirely.
   in the tasks being executed using the Nextcloud container's running user. Specifically, the
   `--user` option will *not* be provided to the `docker exec` command.
 
-# Container Health
+## Container Health
 
 If you do `docker-compose ps`, you will see the active health of the container. The following logic
 is checked every interval of the health check. If any of these checks fail, it is likely the
@@ -79,7 +84,7 @@ container's health status will become *unhealthy*. In this case, you should rest
    container's ID. If for whatever reason the Nextcloud container changes in such a way that the ID
    is no longer valid, the health check would fail.
 
-# Customizing Cron Tasks
+## Customizing Cron Tasks
 
 This container provides the ability for you to run additional tasks inside the Nextcloud container
 in addition to the default `cron.php` task. To add your custom tasks, follow these steps:
@@ -93,33 +98,35 @@ in addition to the default `cron.php` task. To add your custom tasks, follow the
    #!/usr/bin/env bash
    php -f /var/www/html/cron.php
    ```
+
 1. Mount this shell script inside the `/cron-scripts` directory. Here's an example if you're using
    `docker-compose.yml`:
 
    ```yml
    services:
      cron:
-       image: voidpointer/nextcloud-cronjob
+       image: rcdailey/nextcloud-cronjob
        volumes:
        - ./my-scripts/do-something.sh:/cron-scripts/do-something.sh:ro
    ```
+
 1. Recreate the container. Your script will now execute in the Nextcloud container at a regular
    interval.
 
-## Notes
+### Notes
 
 * All cron task shell scripts run at the same interval defined by `NEXTCLOUD_CRON_MINUTE_INTERVAL`.
 * Modification of your own shell scripts on the host do not require that you restart/recreate the
   container.
 
-# Debugging
+## Debugging
 
 All logs from `crond` are configured to print to stdout, so you can monitor container logs (via
 `docker-compose logs -f`). This should allow you to make sure your cron job is working. You can also
 use the "Overview" page in Nextcloud Settings to see if the cron job is being run regularly. Here is
 an example of the logs you will see:
 
-```
+```txt
 Started crond
 -------------------------------------------------------------
  Executing Cron Tasks: Thu Dec  6 17:28:00 CST 2018
