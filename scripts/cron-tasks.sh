@@ -26,7 +26,7 @@ fi
 cd /cron-scripts
 for script in *.sh; do
     echo "> Running Script: $script"
-    docker exec $exec_user -i "$containerId" bash < $script
+    docker exec -u $exec_user -i "$containerId" bash < $script
 done
 
 echo "> Done"
