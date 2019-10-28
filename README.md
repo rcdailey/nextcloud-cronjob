@@ -15,7 +15,8 @@ everything using [Docker Compose](https://docs.docker.com/compose/).
 
 Below is an example of how you set up your `docker-compose.yml` to work with Nextcloud using this
 container. Note that the `app` service is greatly simplified for example purposes. It is only to
-show usage of the cronjob image in conjunction with your Nextcloud container.
+show usage of the cronjob image in conjunction with your Nextcloud container. Note for this example,
+the `docker-compose.yml` file is located at `~/docker_services/nextcloud/docker-compose.yml`.
 
 ```yml
 version: '3.7'
@@ -41,10 +42,14 @@ services:
 In this example, the `cron` service runs with a dependency on `app` (which is Nextcloud itself).
 Every 15 minutes (default) the `cron` service will execute `php -f /var/www/html/cron.php` via the
 `docker exec` command. The `NEXTCLOUD_CONTAINER_NAME` and `NEXTCLOUD_PROJECT_NAME` work together to
-help identify the right container to execute the command in.
+help identify the right container to execute the command in. In this case, my project name is
+`nextcloud` because Docker Compose uses the name of the directory containing the
+`docker-compose.yml` file to prefix the name of the image. And container name is `app` because
+that's what I named the service in the YAML file.
 
 Note that if you don't use Docker Compose, you can leave `NEXTCLOUD_PROJECT_NAME` blank or omitted
-entirely.
+entirely. Please see the Environment Variables section below for more details on configuration and
+how this all works.
 
 ## Environment Variables
 
