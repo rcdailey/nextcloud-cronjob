@@ -120,6 +120,21 @@ in addition to the default `cron.php` task. To add your custom tasks, follow the
 3. Recreate the container. Your script will now execute in the Nextcloud container at a regular
    interval.
 
+Multiple scripts are supported. The container will search for all `*.sh` files inside the
+`/cron-scripts` directory. To make supporting multiple scripts easier, you can also map a directory
+on the host to the `/cron-scripts` directory in the container:
+
+```yml
+services:
+  cron:
+    image: rcdailey/nextcloud-cronjob
+    volumes:
+    - ./my-scripts:/cron-scripts:ro
+```
+
+As an optional safety measure, mount the directory or files as read-only (via the `:ro` at the end).
+The container should not modify the files, but it doesn't hurt to be explicitly strict.
+
 ### Notes
 
 * All cron task shell scripts run at the same interval defined by `NEXTCLOUD_CRON_MINUTE_INTERVAL`.
