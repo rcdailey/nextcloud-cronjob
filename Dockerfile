@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --no-cache docker bash tini
+RUN apk add --no-cache docker-cli bash tini
 
 ENV NEXTCLOUD_EXEC_USER=www-data
 ENV NEXTCLOUD_CONTAINER_NAME=
