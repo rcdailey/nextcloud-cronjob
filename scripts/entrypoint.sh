@@ -2,6 +2,8 @@
 set -e
 [[ ! -z "$DEBUG" ]] && set -x
 
+source /nextcloud-exec.sh
+
 if [[ -z "$NEXTCLOUD_CONTAINER_NAME" ]]; then
     echo "NEXTCLOUD_CONTAINER_NAME is a required variable"
     exit 1
@@ -22,6 +24,15 @@ if [[ -z "$containerId" ]]; then
     exit 1
 else
     echo "Found Nextcloud container with ID $containerId"
+fi
+
+# Verify the chosen shell exists in the Nextcloud container
+if ! nextcloud_exec_no_shell "$containerId" sh -c "command -v \"$NEXTCLOUD_EXEC_SHELL\"" >/dev/null 2>&1
+then
+    echo "ERROR: Shell \"$NEXTCLOUD_EXEC_SHELL\" does not exist in the Nextcloud container"
+    exit 1
+else
+    echo "Chosen shell \"$NEXTCLOUD_EXEC_SHELL\" was found in the Nextcloud container"
 fi
 
 echo "*/$NEXTCLOUD_CRON_MINUTE_INTERVAL * * * * /cron-tasks.sh" \

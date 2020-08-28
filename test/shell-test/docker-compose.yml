@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  app:
+    image: nextcloud:19-fpm-alpine
+
+  cronjob:
+    build: ../..
+    depends_on:
+      - app
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - NEXTCLOUD_PROJECT_NAME=shell-test
+      - NEXTCLOUD_CONTAINER_NAME=app
+      - NEXTCLOUD_CRON_MINUTE_INTERVAL=1
+      - NEXTCLOUD_EXEC_SHELL=sh
+      - NEXTCLOUD_EXEC_SHELL_ARGS=-xc
+      - DEBUG=1

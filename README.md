@@ -77,6 +77,17 @@ how this all works.
   in the tasks being executed using the Nextcloud container's running user. Specifically, the
   `--user` option will *not* be provided to the `docker exec` command.
 
+* `NEXTCLOUD_EXEC_SHELL`<br>
+  Allows specifying a custom shell program that will be used to execute cron tasks inside the
+  Nextcloud container. This shell program *must* exist inside the Nextcloud container itself
+  (validation happens on start up to ensure this). The default value if not specified is `bash`.
+
+* `NEXTCLOUD_EXEC_SHELL_ARGS`<br>
+  Allows custom arguments to be passed to the shell program specified by `NEXTCLOUD_EXEC_SHELL`. See
+  the detailed documentation provided later on in this document for more information. At minimum,
+  the arguments passed to your shell program must allow for the execution of a series of string
+  commands. The default value if not specified is `-c`.
+
 * `DEBUG`<br>
   Enables more verbose logging in core scripts. Useful only for development. To get more verbose
   output in your own custom cron scripts, use `set -x` in the actual script.
@@ -103,15 +114,15 @@ in addition to the default `cron.php` task. To add your custom tasks, follow the
 1. Write a shell script that runs the commands that will be part of your task. This shell script
    must have the `.sh` extension. An example of the contents of such a script is below. As an
    optional security measure, do not make this shell script executable. The contents of the file are
-   piped into `bash`, so the executable bit is not used.
+   piped into `sh`, so the executable bit and shebang line are not used or required.
 
    ```sh
-   #!/usr/bin/env bash
    php -f /var/www/html/cron.php
    ```
 
-2. Mount this shell script inside the `/cron-scripts` directory. Here's an example if you're using
-   `docker-compose.yml`:
+2. Mount this shell script inside the `/cron-scripts` directory. You may also choose to *replace*
+   this directory, but bear in mind that you will not be running the built-in cron tasks in that
+   case. Here's an example if you're using `docker-compose.yml`:
 
    ```yml
    services:
@@ -139,11 +150,42 @@ services:
 As an optional safety measure, mount the directory or files as read-only (via the `:ro` at the end).
 The container should not modify the files, but it doesn't hurt to be explicitly strict.
 
+### Customizing the Shell
+
+By default, all cron task scripts in the `/cron-scripts` directory are executed with `bash`.
+However, not all Nextcloud containers have `bash`. In this case, you may want to override it with a
+shell like `sh`. You can accomplish this (as well as customizing the arguments passed to the shell)
+with `NEXTCLOUD_EXEC_SHELL` and `NEXTCLOUD_EXEC_SHELL_ARGS`.
+
+The shell args are used when passing the contents of script files to the shell executable inside the
+Nextcloud container. Customizing the args might be necessary depending on the shell program you
+choose, or you may want to leverage options for debugging purposes (See "Debugging" section for
+examples).
+
+> **NOTE**<br>
+> The arguments that are passed to the shell program must, at least, allow the execution of a string
+> of commands. See the documentation on your chosen shell for which arguments these should be.
+
+Here is an example of how you would override `bash` for `sh` using `docker-compose.yml` (again,
+greatly simplified for example purposes; this is not a complete YAML):
+
+```yml
+services:
+  cron:
+    image: rcdailey/nextcloud-cronjob
+    environment:
+    - NEXTCLOUD_EXEC_SHELL=sh
+    - NEXTCLOUD_EXEC_SHELL_ARGS=-c
+```
+
+Note that `-c` is the default for `NEXTCLOUD_EXEC_SHELL_ARGS`, so it isn't necessary to specify it
+above. However, it is explicitly specified for example purposes.
+
 ### Notes
 
 * All cron task shell scripts run at the same interval defined by `NEXTCLOUD_CRON_MINUTE_INTERVAL`.
 * Modification of your own shell scripts on the host do not require that you restart/recreate the
-  container.
+  container (only when volume mappings change in the YAML file).
 
 ## Debugging
 
@@ -161,3 +203,17 @@ Started crond
 > Running Script: run_cron_php.sh
 > Done
 ```
+
+You can leverage `NEXTCLOUD_EXEC_SHELL_ARGS` to get more verbose output from your scripts. For
+example, for `bash` you can specify `-x` for debug mode. So you could use this in your YAML:
+
+```yml
+services:
+  cron:
+    image: rcdailey/nextcloud-cronjob
+    environment:
+    - NEXTCLOUD_EXEC_SHELL_ARGS=-xc
+```
+
+Note the addition of `-x` in the arguments. This will provide line-by-line output for each cron task
+shell script executed.
