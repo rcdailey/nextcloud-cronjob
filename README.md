@@ -51,6 +51,27 @@ Note that if you don't use Docker Compose, you can leave `NEXTCLOUD_PROJECT_NAME
 entirely. Please see the Environment Variables section below for more details on configuration and
 how this all works.
 
+### Troubleshooting
+
+Errors you may encounter are below with proposed solutions.
+
+* > ERROR: Shell "bash" does not exist in the Nextcloud container
+
+  The `bash` shell is not supported in your Nextcloud container. Easiest solution is to switch it to
+  `sh` by adding this line to your `environment:` section of your `docker-compose.yml`:
+
+  ```yml
+  - NEXTCLOUD_EXEC_SHELL=sh
+  ```
+
+* > OCI runtime exec failed: exec failed: container_linux.go:349: starting container process caused
+  > "exec: "bash": executable file not found in $PATH": unknown
+
+  Older versions of the `nextcloud-cronjob` container were hard-coded to use `bash` as the shell
+  program executed inside your Nextcloud container. However, some Nextcloud containers do not have
+  `bash`. Please update to the latest version of `rcdailey/nextcloud-cronjob` and follow the steps
+  provided in the previous bullet point.
+
 ## Environment Variables
 
 * `NEXTCLOUD_CONTAINER_NAME`<br>
