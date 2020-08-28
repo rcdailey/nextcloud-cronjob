@@ -77,6 +77,10 @@ how this all works.
   in the tasks being executed using the Nextcloud container's running user. Specifically, the
   `--user` option will *not* be provided to the `docker exec` command.
 
+* `DEBUG`<br>
+  Enables more verbose logging in core scripts. Useful only for development. To get more verbose
+  output in your own custom cron scripts, use `set -x` in the actual script.
+
 ## Container Health
 
 If you do `docker-compose ps`, you will see the active health of the container. The following logic

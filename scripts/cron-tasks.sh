@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+[[ ! -z "$DEBUG" ]] && set -x
 
 echo "-------------------------------------------------------------"
 echo " Executing Cron Tasks: $(date)"
@@ -19,6 +20,8 @@ if [[ -z "$containerId" ]]; then
     echo "ERROR: Unable to find the Nextcloud container"
     exit 1
 fi
+
+echo "> Nextcloud Container ID: ${containerId}"
 
 # Loop through all shell scripts and execute the contents of those scripts in the Nextcloud
 # container. It's done this way so that the user may mount more scripts to be executed in addition
