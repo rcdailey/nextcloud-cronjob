@@ -1,0 +1,40 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout Source Code
+        uses: actions/checkout@v2
+      -
+        name: Docker QEmu Setup
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Docker Buildx Setup
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Docker Login
+        uses: docker/login-action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      -
+        name: Docker Build & Push
+        uses: docker/build-push-action@v2
+        with:
+          # Only publish new images when building the master branch
+          push: ${{ github.ref == 'refs/heads/master' }}
+          platforms: linux/amd64,linux/arm64
+          tags: rcdailey/nextcloud-cronjob:latest
+      -
+        name: Update Repository Description
+        uses: peter-evans/dockerhub-description@v2
+        if: github.ref == 'refs/heads/master'
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          DOCKERHUB_REPOSITORY: rcdailey/nextcloud-cronjob
