@@ -10,7 +10,7 @@ ENV NEXTCLOUD_EXEC_SHELL=bash
 ENV NEXTCLOUD_EXEC_SHELL_ARGS=-c
 
 COPY scripts/*.sh /
-COPY scripts/cron-scripts /cron-scripts
+COPY scripts/cron-scripts-builtin /cron-scripts-builtin
 
 ENTRYPOINT ["tini", "--", "/entrypoint.sh"]
 

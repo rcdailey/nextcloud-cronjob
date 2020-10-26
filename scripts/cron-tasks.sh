@@ -28,8 +28,13 @@ run_scripts_in_dir() {
 }
 
 # Loop through all shell scripts and execute the contents of those scripts in the Nextcloud
-# container. It's done this way so that the user may mount more scripts to be executed in addition
-# to the default ones.
-run_scripts_in_dir /cron-scripts
+# container.
+run_scripts_in_dir /cron-scripts-builtin
+
+# If the user has mounted their own scripts, execute those as well. These are optional. It's done
+# this way so that the user may mount more scripts to be executed in addition to the default ones.
+if [[ -d /cron-scripts ]]; then
+    run_scripts_in_dir /cron-scripts
+fi
 
 echo "> Done"

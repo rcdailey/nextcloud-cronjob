@@ -148,9 +148,8 @@ in addition to the default `cron.php` task. To add your custom tasks, follow the
    php -f /var/www/html/cron.php
    ```
 
-2. Mount this shell script inside the `/cron-scripts` directory. You may also choose to *replace*
-   this directory, but bear in mind that you will not be running the built-in cron tasks in that
-   case. Here's an example if you're using `docker-compose.yml`:
+2. Mount this shell script inside the `/cron-scripts` directory. Here's an example if you're using
+   `docker-compose.yml`:
 
    ```yml
    services:
@@ -164,8 +163,8 @@ in addition to the default `cron.php` task. To add your custom tasks, follow the
    interval.
 
 Multiple scripts are supported. The container will search for all `*.sh` files inside the
-`/cron-scripts` directory. To make supporting multiple scripts easier, you can also map a directory
-on the host to the `/cron-scripts` directory in the container:
+`/cron-scripts` directory inside the container. To make supporting multiple scripts easier, you can
+also map a directory on the host to the `/cron-scripts` directory in the container:
 
 ```yml
 services:
