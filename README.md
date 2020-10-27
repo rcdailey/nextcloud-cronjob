@@ -213,6 +213,8 @@ above. However, it is explicitly specified for example purposes.
 * All cron task shell scripts run at the same interval defined by `NEXTCLOUD_CRON_MINUTE_INTERVAL`.
 * Modification of your own shell scripts on the host do not require that you restart/recreate the
   container (only when volume mappings change in the YAML file).
+* If a custom script in the `/cron-scripts` directory fails, it will not impede the processing of
+  other scripts in the directory.
 
 ## Debugging
 

@@ -9,7 +9,7 @@ nextcloud_exec_no_shell() {
         exec_user="--user $NEXTCLOUD_EXEC_USER"
     fi
 
-    docker exec $exec_user -i "$containerId" "$@"
+    docker exec $exec_user "$containerId" "$@"
 }
 
 nextcloud_exec() {

@@ -21,9 +21,10 @@ echo "> Nextcloud Container ID: ${containerId}"
 
 run_scripts_in_dir() {
     cd "$1"
-    for script in *.sh; do
-        echo "> Running Script: $script"
-        nextcloud_exec "$containerId" "$(< $script)"
+    find . -type f -name '*.sh' -print0 |
+    while IFS= read -r -d '' file; do
+        echo "> Running Script: $file"
+        nextcloud_exec "$containerId" "$(cat $file)" || continue
     done
 }
 
