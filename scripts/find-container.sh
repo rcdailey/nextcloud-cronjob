@@ -2,7 +2,7 @@
 set -e
 
 if [[ ! -z "$NEXTCLOUD_PROJECT_NAME" ]]; then
-    containerName="${NEXTCLOUD_PROJECT_NAME}_"
+    containerName="${NEXTCLOUD_PROJECT_NAME}-"
 else
     matchEnd=","
 fi
