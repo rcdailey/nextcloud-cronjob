@@ -91,8 +91,9 @@ Errors you may encounter are below with proposed solutions.
   "hint" used to identify the Nextcloud container by name. The hint is built as:
 
   ```txt
-  ${NEXTCLOUD_PROJECT_NAME}_${NEXTCLOUD_CONTAINER_NAME}
+  ${NEXTCLOUD_PROJECT_NAME}-${NEXTCLOUD_CONTAINER_NAME}
   ```
+  > since Docker-compose V2, the naming rule has changed from `<project-name>_<service-name>_<replica-number>` to `<project-name>-<service-name>-<replica-number>` 
 
 * `NEXTCLOUD_CRON_MINUTE_INTERVAL`<br>
   The interval, in minutes, of how often the cron task executes. The default is 15 minutes.
