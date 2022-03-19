@@ -3,8 +3,9 @@ set -e
 
 if [[ ! -z "$NEXTCLOUD_PROJECT_NAME" ]]; then
     containerName="${NEXTCLOUD_PROJECT_NAME}[_-]"
+    matchEnd="[\._-]\d+"
 else
-    matchEnd="(,|\.\d+)"
+    matchEnd=","
 fi
 
 containerName="${containerName}${NEXTCLOUD_CONTAINER_NAME}"
