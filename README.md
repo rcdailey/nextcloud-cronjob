@@ -1,5 +1,8 @@
 # Nextcloud Cron Job Docker Container
 
+> [!WARNING]
+> **This repository is archived and no longer maintained.** No new features, bug fixes, or security updates will be provided. Use at your own risk. Feel free to fork this project if you wish to continue development.
+
 Simple cronjob support for your Nextcloud Docker container!
 
 * [Docker Hub](https://hub.docker.com/r/rcdailey/nextcloud-cronjob)
